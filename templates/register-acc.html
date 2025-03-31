@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<body>
+    <div id="error-message" style="color: red; display: none;"></div>
+
+    <div id="register-container">
+        <h2>Registracija</h2>
+        
+        <div>
+            <label for="username">Uporabniško ime:</label>
+            <input type="text" id="username" required>
+        </div>
+        
+        <div>
+            <label for="password">Geslo:</label>
+            <input type="password" id="password" required>
+        </div>
+
+        <button onclick="register()">Registracija</button>
+    </div>
+
+</body>
+
+<script>
+
+    function register(){
+
+        var username = document.getElementById(username).value()
+        var password = document.getElementById(password).value()
+
+        $.ajax({
+        url: "/register",
+        method: "POST",
+        data: {
+            username: username,
+            password: password
+        },
+        success: function(result) {
+            if (result.success) { 
+                window.location.href = '/login_page';
+            } else {
+                errorMessage.textContent = result.error;
+                errorMessage.style.display = 'block';
+            }
+        }
+    });
+    }
+</script>
+
+</html>

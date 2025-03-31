@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, jsonify
 import sqlite3
 
 
@@ -6,10 +6,10 @@ app = Flask(__name__)
 database = 'database.db'
 login_db = 'login.db'
 
-con = sqlite3.connect("login.db")
-cur = con.cursor()
-cur.execute("CREATE TABLE login(username, password)")
-con.commit()
+con_login = sqlite3.connect("login.db")
+cur_login = con_login.cursor()
+cur_login.execute("CREATE TABLE IF NOT EXISTS login(username, password)")
+con_login.commit()
 
 app.secret_key = "WellOffToVisitYourMother!" 
 
@@ -29,20 +29,30 @@ def index():
 @app.route("/login",  methods=['POST'])
 def login():
     
-    con = sqlite3.connect("login.db")
-    cur = con.cursor()
-
 
     try:
         username = request.form["username"]
         password = request.form["password"]
-        try:
-            info = cur.execute("SELECT * FROM login WHERE username={username}")
-            info2 = info.fetchall()
-            if password in info2:
-                return render_template('/')
-        except:
-            return render_template('register-acc.html')
 
+        info = cur_login.execute(f"SELECT * FROM login WHERE username={username}")
+        info2 = info.fetchall()
+        if password in info2:
+            con_login.commit()
+            return render_template('/')
+        
     except:
-        pass
+        return render_template('register-acc.html')
+
+
+@app.route("/register")
+def register():
+    username = request.form["username"]
+    password = request.form["password"]
+    
+    reg_user = cur_login.execute(f"INSER INTO login(username, password) VALUES ({username}, {password})")
+
+    return jsonify({'success': True})
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
