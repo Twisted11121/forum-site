@@ -24,8 +24,8 @@
             <input type="password" id="password" required>
         </div>
 
-        <button onclick="login()">Prijava / Registracija</button>
-        <a href="register-acc.html">Ustvari Račun</a>
+        <button onclick="login()">Prijava</button>
+        <a href="/registerPage">Registracija</a>
 
     </div>
 
@@ -36,8 +36,8 @@
 
     function login(){
 
-        var username = document.getElementById(username).value()
-        var password = document.getElementById(password).value()
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
 
         $.ajax({
         url: "/login",

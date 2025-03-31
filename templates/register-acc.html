@@ -31,8 +31,8 @@
 
     function register(){
 
-        var username = document.getElementById(username).value()
-        var password = document.getElementById(password).value()
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
 
         $.ajax({
         url: "/register",
@@ -43,7 +43,7 @@
         },
         success: function(result) {
             if (result.success) { 
-                window.location.href = '/login_page';
+                window.location.href = '/';
             } else {
                 errorMessage.textContent = result.error;
                 errorMessage.style.display = 'block';
