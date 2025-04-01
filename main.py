@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, jsonify
+from flask import Flask, render_template, request, session, jsonify, redirect, url_for
 import sqlite3
 
 
@@ -34,14 +34,17 @@ def login():
     if request.method == 'POST':
         username = request.form["username"]
         password = request.form["password"]
+        
+
         session['username'] = request.form['username']
+
         cur_login.execute("SELECT password FROM login WHERE username=?", (username,))
         result = cur_login.fetchone()
 
         if result is not None:
             stored_password = result[0]
 
-            if password == stored_password:  # Compare the provided password with the stored password
+            if password == stored_password:
                 return jsonify(success=True)
             else:
                 return jsonify(success=False, error="Invalid username or password"), 401
@@ -65,6 +68,12 @@ def register():
     con_login.commit()
     con_login.close()
     return jsonify({'success': True})
+
+@app.route('/logout')
+def logout():
+
+    session.pop('username', None)
+    return render_template("login_page.html")
 
 
 if __name__ == "__main__":
