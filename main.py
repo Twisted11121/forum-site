@@ -20,7 +20,6 @@ app.secret_key = "WellOffToVisitYourMother!"
 @app.route('/')
 def index():
 
-    #Add session
     if 'username' in session:
         return render_template('index.html')
 
@@ -35,7 +34,7 @@ def login():
     if request.method == 'POST':
         username = request.form["username"]
         password = request.form["password"]
-
+        session['username'] = request.form['username']
         cur_login.execute("SELECT password FROM login WHERE username=?", (username,))
         result = cur_login.fetchone()
 
