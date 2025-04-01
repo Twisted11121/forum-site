@@ -32,20 +32,22 @@ def login():
     cur_login = con_login.cursor()
     
 
-    try:
+    if request.method == 'POST':
         username = request.form["username"]
         password = request.form["password"]
 
-        info = cur_login.execute(f"SELECT * FROM login WHERE username={username}")
-        info2 = info.fetchall()
-        if password in info2:
-            con_login.commit()
-            con_login.close()
-            return render_template('/')
-        
-    except:
-        con_login.close()
-        return render_template('register-acc.html')
+        cur_login.execute("SELECT password FROM login WHERE username=?", (username,))
+        result = cur_login.fetchone()
+
+        if result is not None:
+            stored_password = result[0]
+
+            if password == stored_password:  # Compare the provided password with the stored password
+                return jsonify(success=True)
+            else:
+                return jsonify(success=False, error="Invalid username or password"), 401
+        else:
+            return jsonify(success=False, error="Invalid username or password"), 401
 
 @app.route('/registerPage')
 def showRegi():
@@ -60,7 +62,7 @@ def register():
     username = request.form["username"]
     password = request.form["password"]
     
-    reg_user = cur_login.execute(f"INSERT INTO login(username, password) VALUES ({username}, {password})")
+    reg_user = cur_login.execute("INSERT INTO login (username, password) VALUES (?, ?)", (username, password))
     con_login.commit()
     con_login.close()
     return jsonify({'success': True})
