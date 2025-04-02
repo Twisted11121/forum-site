@@ -11,16 +11,17 @@
 | Discord  | Multi funkcionalna aplikacija    | Ne enotnost dijakov    | Vsi dijaki na eni spletni strani |
 | Snapchat | Multi funkcionalna aplikacija    | Ne enotnost dijakov    | Združeni dijaki                  |
 
-## Prednost (S) | SLABOST (W)
+## Prednost (S)
 - Specifična skupina uporabnikov
 - Lahka širitev informacij
 - Možnost razprave o različnih temah
+## SLABOST (W)
 - Potreba po moderaciji
 - Nizka začetna aktivnost
-
-## Priložnost (O) | Grožnje (T)
+## Priložnost (O)
 - Partnerstva z drugimi šolami
 - Organizacija dogodkov
+##  Grožnje (T)
 - Konkurenca
 - Varnostne skrbi
 - Zasičenost trga
