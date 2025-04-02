@@ -1,4 +1,3 @@
-# forum-site
 # Forum Site za Srednje Šole
 
 ## Velikost trga:
