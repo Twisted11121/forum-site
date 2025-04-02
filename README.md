@@ -2,7 +2,7 @@
 # Forum Site za Srednje Šole
 
 ## Velikost trga:
-- Dijaki šolskega centra Kranj.
+- Dijaki šolskega centra Kranj in drugih srednjih šol.
 
 ## Konkurenčna analiza:
 
