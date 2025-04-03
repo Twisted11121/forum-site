@@ -44,3 +44,13 @@
 2. Sodelovanje z lokalnimi podjetji za pridobitev ekskluzivnih ponudb
 3. Akcija “povabi prijatelja” (oba dobita kupon za eno izmed sodelujočih podjetij.)
 4. Ustno izročilo
+
+## TODO List:
+1. Search function
+2. Main database
+3. User profiles
+4. Thread Creation
+5. Moderation tools for admin
+6. Likes/Dislikes \
+                     mybe
+7. Bookmarks      /
