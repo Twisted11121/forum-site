@@ -51,6 +51,5 @@
 3. User profiles
 4. Thread Creation
 5. Moderation tools for admin
-6. Likes/Dislikes \
-                     mybe
-7. Bookmarks      /
+6. Likes/Dislikes
+7. Bookmarks
