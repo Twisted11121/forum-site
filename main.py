@@ -5,6 +5,7 @@ import requests
 
 app = Flask(__name__)
 database = 'threads.db'
+database = 'threads.db'
 login_db = 'login.db'
 request_db = 'request.db'
 
@@ -54,6 +55,38 @@ def threadDB():
 requastDB()
 loginDB()
 threadDB()
+
+def i_login_db():
+    con_login = sqlite3.connect(login_db)
+    cur_login = con_login.cursor()
+    cur_login.execute("CREATE TABLE IF NOT EXISTS login(username TEXT, password TEXT)")
+    con_login.commit()
+    con_login.close()
+
+def thread_db():
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS threads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL
+        )
+    ''')
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS comments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            thread_id INTEGER NOT NULL,
+            username TEXT NOT NULL,
+            content TEXT NOT NULL,
+            FOREIGN KEY (thread_id) REFERENCES threads (id) ON DELETE CASCADE
+        )
+    ''')
+    con.commit()
+    con.close()
+
+i_login_db()
+thread_db()
 
 app.secret_key = "WellOffToVisitYourMother!" 
 
@@ -197,3 +230,4 @@ def getCat():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
