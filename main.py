@@ -2,10 +2,60 @@ from flask import Flask, render_template, request, session, jsonify, redirect, u
 import sqlite3
 from datetime import datetime
 import re
+import requests
 
 app = Flask(__name__)
 database = 'threads.db'
+database = 'threads.db'
 login_db = 'login.db'
+request_db = 'request.db'
+
+def loginDB():
+    con_login = sqlite3.connect(login_db)
+    cur_login = con_login.cursor()
+    cur_login.execute("CREATE TABLE IF NOT EXISTS login(username TEXT, password TEXT)")
+    con_login.commit()
+    con_login.close()
+
+def requastDB():
+    con_login = sqlite3.connect(login_db)
+    cur_login = con_login.cursor()
+    cur_login.execute('''
+        CREATE TABLE IF NOT EXISTS fRequests(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        content TEXT NOT NULL)''')
+    
+    con_login.commit()
+    con_login.close()    
+
+
+def threadDB():
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS threads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            timestamp DATETIME
+        )
+    ''')
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS comments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            thread_id INTEGER NOT NULL,
+            username TEXT NOT NULL,
+            content TEXT NOT NULL,
+            FOREIGN KEY (thread_id) REFERENCES threads (id) ON DELETE CASCADE
+        )
+    ''')
+    con.commit()
+    con.close()
+
+requastDB()
+loginDB()
+threadDB()
 
 def i_login_db():
     con_login = sqlite3.connect(login_db)
@@ -58,8 +108,11 @@ def displayThreads():
     cur = con.cursor()
     threads = cur.execute('SELECT * FROM threads').fetchall()
     con.close()
+    
+    username = session['username']
+    
 
-    return render_template('threads.html', threads=threads)
+    return render_template('threads.html', threads=threads, username=username)
 
 @app.route("/login", methods=['POST'])
 def login():
@@ -167,6 +220,76 @@ def displayUserPage(username):
     con.close()
 
     return render_template("userPage.html", username=username, userPic=userPic, bio=bio, threads=threads)
+
+def displayThreads():
+    con = sqlite3.connect(request_db)
+    cur = con.cursor()
+    threads = cur.execute('SELECT * FROM threads').fetchall()
+    con.close()
+    
+    #Finish feature-requests.html
+    return render_template('threads.html', threads=threads) 
+
+
+@app.route('/novice')
+def novice():
+    
+    if request.method == 'POST':
+        con = sqlite3.connect(request_db)
+        cur = con.cursor()
+
+        content = request.form['content']
+        username = session['username']  
+
+        cur.execute('INSERT INTO fRequests (username, content) VALUES (?, ?, ?)', (username, content))
+        con.commit()
+        con.close()
+        return redirect(url_for('displayRequests'))
+        
+    
+    return render_template('novice.html')
+
+@app.route('/cuteCat')
+def getCat():
+    img_url = requests.get("https://cataas.com/cat?json=true").json()
+    image=f"https://cataas.com/cat/{img_url["id"]}"
+    
+    return render_template('cuteCat.html', img=image)
+
+def displayThreads():
+    con = sqlite3.connect(request_db)
+    cur = con.cursor()
+    threads = cur.execute('SELECT * FROM threads').fetchall()
+    con.close()
+    
+    #Finish feature-requests.html
+    return render_template('threads.html', threads=threads) 
+
+
+@app.route('/novice')
+def novice():
+    
+    if request.method == 'POST':
+        con = sqlite3.connect(request_db)
+        cur = con.cursor()
+
+        content = request.form['content']
+        username = session['username']  
+
+        cur.execute('INSERT INTO fRequests (username, content) VALUES (?, ?, ?)', (username, content))
+        con.commit()
+        con.close()
+        return redirect(url_for('displayRequests'))
+        
+    
+    return render_template('novice.html')
+
+@app.route('/cuteCat')
+def getCat():
+    img_url = requests.get("https://cataas.com/cat?json=true").json()
+    image=f"https://cataas.com/cat/{img_url["id"]}"
+    
+    return render_template('cuteCat.html', img=image)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
