@@ -27,12 +27,12 @@
     <div class="container mt-4 flex-grow-1">
         <div class="card mb-4">
             <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <img src="https://via.placeholder.com/50" class="rounded-circle me-3" alt="User Avatar">
-                    <h5 class="mb-0">{{ thread[2] }}</h5> <!-- Display thread title -->
+                <div class="d-flex mb-3">
+                    <img src="{{ userPic }}" class="rounded-circle me-3" alt="User Avatar" width="100" height="100">
+                    <h5 class="mb-0">{{ thread[2] }}</h5> 
                 </div>
-                <h3 id="thread-title">{{ thread[1] }}</h3> <!-- Display thread title -->
-                <p id="thread-content">{{ thread[2] }}</p> <!-- Display thread content -->
+                <h3 id="thread-title">{{ thread[1] }}</h3> 
+                <p id="thread-content">{{ thread[2] }}</p> 
             </div>
         </div>
 
@@ -41,12 +41,12 @@
             {% for comment in comments %}
             <div class="list-group-item d-flex">
                 <div class="me-2 text-center">
-                    <img src="https://via.placeholder.com/40" class="rounded-circle" alt="User Avatar">
-                    <strong>{{ comment[2] }}</strong> <!-- Display username -->
+                    <img src="{{ commentPic }}" class="rounded-circle me-3" alt="User Avatar" width="100" height="100">
+                    <strong>{{ comment[2] }}</strong> 
                 </div>
                 <div class="flex-grow-1">
                     <div class="border p-2">
-                        <p class="mb-0">{{ comment[3] }}</p> <!-- Display comment content -->
+                        <p class="mb-0">{{ comment[3] }}</p> 
                     </div>
                 </div>
             </div>

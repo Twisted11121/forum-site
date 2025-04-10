@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .user-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .user-header img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            margin-right: 20px;
+        }
+        .user-header h1 {
+            margin: 0;
+        }
+        .bio {
+            margin-bottom: 20px;
+        }
+        .threads {
+            list-style-type: none;
+            padding: 0;
+        }
+        .threads li {
+            background: #e9ecef;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="user-header">
+        <img src="user-picture.jpg" alt="User Picture">
+        <div>
+            <h1>John Doe</h1>
+            <p class="bio">Web developer, tech enthusiast, and coffee lover.</p>
+        </div>
+    </div>
+
+    <h2>Posted Threads</h2>
+    <ul class="threads">
+        <li><a href="#">Thread Title 1</a> - Brief description of the thread.</li>
+        <li><a href="#">Thread Title 2</a> - Brief description of the thread.</li>
+        <li><a href="#">Thread Title 3</a> - Brief description of the thread.</li>
+        <li><a href="#">Thread Title 4</a> - Brief description of the thread.</li>
+    </ul>
+</div>
+
+</body>
+</html>

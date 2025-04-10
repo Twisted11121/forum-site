@@ -49,7 +49,6 @@
 1. Search function
 2. Main database
 3. User profiles
-4. Thread Creation
+4. Thread Creation &#x2611;
 5. Moderation tools for admin
 6. Likes/Dislikes
-7. Bookmarks
