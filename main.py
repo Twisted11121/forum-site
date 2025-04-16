@@ -3,19 +3,12 @@ import sqlite3
 from datetime import datetime
 import re
 import requests
+import os
 
 app = Flask(__name__)
 database = 'threads.db'
-database = 'threads.db'
 login_db = 'login.db'
 request_db = 'request.db'
-
-def loginDB():
-    con_login = sqlite3.connect(login_db)
-    cur_login = con_login.cursor()
-    cur_login.execute("CREATE TABLE IF NOT EXISTS login(username TEXT, password TEXT)")
-    con_login.commit()
-    con_login.close()
 
 def requastDB():
     con_login = sqlite3.connect(login_db)
@@ -29,38 +22,18 @@ def requastDB():
     con_login.commit()
     con_login.close()    
 
-
-def threadDB():
-    con = sqlite3.connect(database)
-    cur = con.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS threads (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            content TEXT NOT NULL,
-            timestamp DATETIME
-        )
-    ''')
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS comments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            thread_id INTEGER NOT NULL,
-            username TEXT NOT NULL,
-            content TEXT NOT NULL,
-            FOREIGN KEY (thread_id) REFERENCES threads (id) ON DELETE CASCADE
-        )
-    ''')
-    con.commit()
-    con.close()
-
 requastDB()
-loginDB()
-threadDB()
 
 def i_login_db():
     con_login = sqlite3.connect(login_db)
     cur_login = con_login.cursor()
-    cur_login.execute("CREATE TABLE IF NOT EXISTS login(username TEXT, password TEXT, userPic TEXT)")
+    cur_login.execute('''
+                      CREATE TABLE IF NOT EXISTS login (
+                        username TEXT,
+                        password TEXT,
+                        userPic TEXT,
+                        bio TEXT
+                      )''')
     con_login.commit()
     con_login.close()
 
@@ -98,7 +71,7 @@ def index():
    
 
     if 'username' in session:
-        return render_template('index.html')
+        return render_template('index.html', username=session['username'])
 
     return render_template('login_page.html')
 
@@ -148,9 +121,10 @@ def register():
     username = request.form["username"]
     password = request.form["password"]
     
-    defaultUserPic = "https://static.wikia.nocookie.net/frutigeraero/images/2/2a/Icon1.png/revision/latest?cb=20241230231133"
+    defaultUserPic = "default-avatar.jpg"
+    bio = "Hello, I'm new here! :)"
 
-    cur_login.execute("INSERT INTO login (username, password, userPic) VALUES (?, ?, ?)", (username, password, defaultUserPic))
+    cur_login.execute("INSERT INTO login (username, password, userPic, bio) VALUES (?, ?, ?, ?)", (username, password, defaultUserPic, bio))
     con_login.commit()
     con_login.close()
     return jsonify({'success': True})
@@ -196,74 +170,86 @@ def thread(thread_id):
     creator = cur.execute('SELECT creator FROM threads WHERE id = ?', (thread_id,)).fetchone()
     thread = cur.execute('SELECT * FROM threads WHERE id = ?', (thread_id,)).fetchone()
     comments = cur.execute('SELECT * FROM comments WHERE thread_id = ?', (thread_id,)).fetchall()
-    
-    commUsername = comments[0][2]
-
-    commentPic = curLog.execute('SELECT userPic FROM login WHERE username = ?', (commUsername,)).fetchall()
     userPic = curLog.execute('SELECT userPic FROM login WHERE username = ?', (creator)).fetchone()
-    
     clean_url = re.sub(r"[()',]", "", str(userPic))
-    clean_url_com = re.sub(r"[()',]", "", str(commentPic[0]))
+    
+    if comments:
+        commUsername = comments[0][2]
+        commentPic = curLog.execute('SELECT userPic FROM login WHERE username = ?', (commUsername,)).fetchall()
+        clean_url_com = re.sub(r"[()',]", "", str(commentPic[0]))
+        conLog.close()
+        con.close()
+        return render_template('thread-template.html', thread=thread, comments=comments, userPic=clean_url, commentPic=clean_url_com)
+
     conLog.close()
     con.close()
 
-    return render_template('thread-template.html', thread=thread, comments=comments, userPic=clean_url, commentPic=clean_url_com)
+    return render_template('thread-template.html', thread=thread, userPic=clean_url)
 
-@app.route('/user/<string:username>', methods=['GET', 'POST'])
+@app.route('/user/<username>', methods=['GET', 'POST'])
 def displayUserPage(username):
     con = sqlite3.connect(login_db)
     cur = con.cursor()
-    userPic = cur.execute('SELECT userPic FROM login WHERE username = ?', (username)).fetchone()
-    bio = cur.execute('SELECT bio FROM login WHERE username = ?', (username)).fetchone()
-    threads = cur.execute('SELECT title, timestamp FROM threads WHERE username = ?', (username)).fetchone()
+    con_T = sqlite3.connect(database)
+    cur_T = con_T.cursor()
+
+    userPic = cur.execute('SELECT userPic FROM login WHERE username = ?', (username,)).fetchone()
+    bio = cur.execute('SELECT bio FROM login WHERE username = ?', (username,)).fetchone()
+    threads = cur_T.execute('SELECT id, title, timestamp FROM threads WHERE creator = ?', (username,)).fetchall()
+    
+    clean_userPic = re.sub(r"[()',]", "", str(userPic))
+    clean_bio = re.sub(r"[()',]", "", str(bio))
     
     con.close()
+    con_T.close()
+    
+    return render_template("userPage.html", 
+                         username=username, 
+                         userPic=clean_userPic, 
+                         bio=clean_bio, 
+                         threads=threads)
 
-    return render_template("userPage.html", username=username, userPic=userPic, bio=bio, threads=threads)
 
-def displayThreads():
-    con = sqlite3.connect(request_db)
+@app.route('/editPage', methods=['GET'])
+def editPage():
+    Username = request.args.get('username')
+    if session["username"] ==  Username:
+        return jsonify({'success': True})
+
+@app.route("/editProfile", methods=['GET'])
+def editProfile():
+    con = sqlite3.connect(login_db)
     cur = con.cursor()
-    threads = cur.execute('SELECT * FROM threads').fetchall()
-    con.close()
-    
-    #Finish feature-requests.html
-    return render_template('threads.html', threads=threads) 
+    username = session['username']
+    bio = cur.execute('SELECT bio FROM login WHERE username = ?', (username,)).fetchone()
+    clean_bio = re.sub(r"[()',]", "", str(bio))
+    return render_template('updateProfile.html', username=session['username'], prevbio=bio)
 
 
-@app.route('/novice')
-def novice():
-    
-    if request.method == 'POST':
-        con = sqlite3.connect(request_db)
-        cur = con.cursor()
+@app.route('/updateProfile', methods=['POST'])
+def updateProfile():
+    con = sqlite3.connect(login_db)
+    cur = con.cursor()
 
-        content = request.form['content']
-        username = session['username']  
+    username = session['username']
+    bio = request.form.get('bio', None)
+    userPic = request.files.get('profilePic', None)
 
-        cur.execute('INSERT INTO fRequests (username, content) VALUES (?, ?, ?)', (username, content))
-        con.commit()
-        con.close()
-        return redirect(url_for('displayRequests'))
+    if bio or userPic:
+        if userPic:
+            file_path = os.path.join("userPictures", userPic.filename)
+            userPic.save(file_path)
+            cur.execute('UPDATE login SET userPic = ? WHERE username = ?', (userPic.filename, username))
         
-    
-    return render_template('novice.html')
+        if bio:
+            cur.execute('UPDATE login SET bio = ? WHERE username = ?', (bio, username))
+        
+        con.commit()
 
-@app.route('/cuteCat')
-def getCat():
-    img_url = requests.get("https://cataas.com/cat?json=true").json()
-    image=f"https://cataas.com/cat/{img_url["id"]}"
-    
-    return render_template('cuteCat.html', img=image)
-
-def displayThreads():
-    con = sqlite3.connect(request_db)
-    cur = con.cursor()
-    threads = cur.execute('SELECT * FROM threads').fetchall()
     con.close()
-    
-    #Finish feature-requests.html
-    return render_template('threads.html', threads=threads) 
+
+    return redirect(url_for('displayUserPage', username=username))
+
 
 
 @app.route('/novice')

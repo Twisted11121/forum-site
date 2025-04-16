@@ -17,7 +17,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Categories</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/cuteCat">Cute Maček</a></li>
                     <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
                 </ul>
             </div>
@@ -26,7 +26,7 @@
     
     <div class="container mt-4 flex-grow-1">
         <h1>Forum Threads</h1>
-        <a href="/create_thread" class="btn btn-primary mb-3">Create a New Thread</a>
+        <a href="/create_thread" class="btn btn-primary mb-3">Ustvari nov thread</a>
         <ul class="list-group">
             {% for thread in threads %}
             <li class="list-group-item">
@@ -34,7 +34,7 @@
                     <strong>{{ thread[1] }}</strong>
                 </a>
                 <p class="mb-1">{{ thread[2] }}</p>
-                <small>Posted by {{ thread[3] }}</small>
+                <small>Objavil {{ thread[3] }} dne {{ thread[4] }}</small>
             </li>
             {% endfor %}
         </ul>
