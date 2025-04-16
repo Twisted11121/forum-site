@@ -55,7 +55,7 @@ Page.html
             
             <form id="editProfileForm" method="POST" action="/updateProfile" enctype="multipart/form-data">
                 <div class="profile-pic-container">
-                    <img src="/userPictures/{{ user_picture }}" alt="Profile Picture" class="profile-pic" id="profilePreview">
+                    <img src="{{ url_for('user_pictures', filename=user_picture) }}" alt="Profile Picture" class="profile-pic" id="profilePreview">
                     <div class="mb-3">
                         <label for="profilePic" class="form-label">Change Profile Picture</label>
                         <input type="file" class="form-control" id="profilePic" name="profilePic" accept="image/*">

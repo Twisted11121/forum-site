@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, jsonify, redirect, url_for
+from flask import Flask, render_template, request, session, jsonify, redirect, url_for, send_from_directory
 import sqlite3
 from datetime import datetime
 import re
@@ -133,6 +133,12 @@ def register():
 def logout():
     session.pop('username', None)
     return render_template("login_page.html")
+
+
+@app.route('/userPictures/<path:filename>')
+def user_pictures(filename):
+    return send_from_directory('userPictures', filename)
+
 
 @app.route('/create_thread', methods=['GET', 'POST'])
 def create_thread():
@@ -276,6 +282,23 @@ def getCat():
     image=f"https://cataas.com/cat/{img_url["id"]}"
     
     return render_template('cuteCat.html', img=image)
+
+
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('query')
+    print(query)
+    if not query:
+        query = ""
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    
+    threads = cur.execute("SELECT * FROM threads WHERE title LIKE ?", ('%' + query + '%',)).fetchall()
+    
+    con.close()
+    
+    return render_template('search.html', threads=threads, query=query)
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

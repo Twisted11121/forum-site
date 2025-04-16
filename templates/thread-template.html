@@ -28,7 +28,7 @@
         <div class="card mb-4">
             <div class="card-body">
                 <div class="d-flex mb-3">
-                    <img src="/userPictures/{{ userPic }}" class="rounded-circle me-3" alt="User Avatar" width="100" height="100">
+                    <img src="{{ url_for('user_pictures', filename=userPic) }}" class="rounded-circle me-3" alt="User Avatar" width="100" height="100">
                     <a href="{{ url_for('displayUserPage', username=thread[3]) }}">{{ thread[3] }}</a>
                 </div>
                 <h3 id="thread-title">{{ thread[1] }}</h3> 
@@ -40,15 +40,15 @@
         <div id="replies-list" class="list-group mb-4">
             {% for comment in comments %}
             <div class="list-group-item d-flex">
-                <div class="me-2 text-center">
-                    <img src="{{ commentPic }}" class="rounded-circle me-3" alt="User Avatar" width="100" height="100">
-                    <strong>{{ comment[2] }}</strong> 
+            <div class="me-2 text-center d-flex flex-column align-items-center">
+                <img src="{{ url_for('user_pictures', filename=commentPic) }}" class="rounded-circle mb-2" alt="User Avatar" width="70" height="70">
+                <strong>{{ comment[2] }}</strong> 
+            </div>
+            <div class="flex-grow-1">
+                <div class="border p-2">
+                <p class="mb-0">{{ comment[3] }}</p> 
                 </div>
-                <div class="flex-grow-1">
-                    <div class="border p-2">
-                        <p class="mb-0">{{ comment[3] }}</p> 
-                    </div>
-                </div>
+            </div>
             </div>
             {% endfor %}
         </div>

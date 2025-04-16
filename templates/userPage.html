@@ -113,7 +113,7 @@
 
 <div class="container">
     <div class="user-header">
-        <img src="/userPictures/{{ userPic }}" alt="User Picture">
+        <img src="{{ url_for('user_pictures', filename=userPic) }}" alt="User Picture">
         <div>
             <h1 id="username">{{ username }}</h1>
             <p class="bio">{{ bio }}</p>
