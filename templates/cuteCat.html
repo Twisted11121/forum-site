@@ -4,33 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cute Cat</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
             background-color: #f9f9f9;
-        }
-        .cat-container {
-            text-align: center;
+            margin: 0;
         }
         .cat-container img {
-            max-width: 700px;
+            max-width: 30em;
             height: auto;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        
-
+        .cat-container {
+            margin-top: 50px;
+        }
     </style>
 </head>
 <body>
-    <div class="cat-container">
-        <h1>Tukaj je ljubka mačka!</h1>
-        <img src="{{ img }}" alt="Cute Cat">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Forum</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Domov</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/cuteCat">Cute Maček</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('displayUserPage', username=username) }}">Profil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Odjava</a></li>
+                    <li class="nav-item">
+                        <form class="d-flex" id="searchForm" method="GET" action="/search">
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container cat-container text-center">
+        <h1 class="mb-4">Tukaj je ljubka mačka!</h1>
+        <img src="{{ img }}" alt="Cute Cat" class="img-fluid">
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

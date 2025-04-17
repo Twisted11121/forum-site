@@ -11,16 +11,17 @@ login_db = 'login.db'
 request_db = 'request.db'
 
 def requastDB():
-    con_login = sqlite3.connect(login_db)
-    cur_login = con_login.cursor()
-    cur_login.execute('''
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    con.execute('''
         CREATE TABLE IF NOT EXISTS fRequests(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL,
+        title TEXT NOT NULL,
         content TEXT NOT NULL)''')
     
-    con_login.commit()
-    con_login.close()    
+    con.commit()
+    con.close()    
 
 requastDB()
 
@@ -32,8 +33,16 @@ def i_login_db():
                         username TEXT,
                         password TEXT,
                         userPic TEXT,
-                        bio TEXT
+                        bio TEXT,
+                        role TEXT DEFAULT 'user'
                       )''')
+    
+    """cur_login.execute('''
+                      INSERT INTO login 
+                      (username, password, userPic, bio)
+                      VALUES (?, ?, ?, ?)''',
+                      ("admin", "admin", "default-avatar.jpg", "Hello, I'm admin! :)"))"""
+    
     con_login.commit()
     con_login.close()
 
@@ -68,8 +77,6 @@ app.secret_key = "WellOffToVisitYourMother!"
 
 @app.route('/')
 def index():
-   
-
     if 'username' in session:
         return render_template('index.html', username=session['username'])
 
@@ -180,12 +187,15 @@ def thread(thread_id):
     clean_url = re.sub(r"[()',]", "", str(userPic))
     
     if comments:
-        commUsername = comments[0][2]
-        commentPic = curLog.execute('SELECT userPic FROM login WHERE username = ?', (commUsername,)).fetchall()
-        clean_url_com = re.sub(r"[()',]", "", str(commentPic[0]))
+        commentPics = {}
+        for comment in comments:
+            commUsername = comment[2]
+            commentPic = curLog.execute('SELECT userPic FROM login WHERE username = ?', (commUsername,)).fetchone()
+            clean_url_com = re.sub(r"[()',]", "", str(commentPic)) if commentPic else "default-avatar.jpg"
+            commentPics[commUsername] = clean_url_com
         conLog.close()
         con.close()
-        return render_template('thread-template.html', thread=thread, comments=comments, userPic=clean_url, commentPic=clean_url_com)
+        return render_template('thread-template.html', thread=thread, comments=comments, userPic=clean_url, commentPics=commentPics)
 
     conLog.close()
     con.close()
@@ -229,7 +239,7 @@ def editProfile():
     username = session['username']
     bio = cur.execute('SELECT bio FROM login WHERE username = ?', (username,)).fetchone()
     clean_bio = re.sub(r"[()',]", "", str(bio))
-    return render_template('updateProfile.html', username=session['username'], prevbio=bio)
+    return render_template('updateProfile.html', username=session['username'], prevbio=clean_bio)
 
 
 @app.route('/updateProfile', methods=['POST'])
@@ -298,6 +308,45 @@ def search():
     con.close()
     
     return render_template('search.html', threads=threads, query=query)
+
+
+@app.route('/requestFeature', methods=['POST'])
+def storeRequest():
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    
+    username = session['username']
+    title = request.form['featureTitle']
+    content = request.form['featureDescription']
+    
+    cur.execute('INSERT INTO fRequests (username, title, content) VALUES (?, ?, ?)', (username, title, content))
+    con.commit()
+    con.close()
+    return render_template('novice.html')
+
+@app.route('/adminDashboard', methods=['GET'])
+def adminDashboard():
+    con = sqlite3.connect(login_db)
+    cur = con.cursor()
+    
+    username = session['username']
+    role = cur.execute('SELECT role FROM login WHERE username = ?', (username,)).fetchone()
+    
+    if role or role[0] == 'admin':
+        return render_template('adminDashboard.html')
+    else:
+        return render_template('index.html')
+
+@app.route('/displayRequests')
+def displayRequests():
+    con = sqlite3.connect(request_db)
+    cur = con.cursor()
+    
+    requests = cur.execute('SELECT * FROM fRequests').fetchall()
+    
+    con.close()
+    
+    return render_template('feauture-requests.html', requests=requests)
 
 
 if __name__ == "__main__":

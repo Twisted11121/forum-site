@@ -4,12 +4,14 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     </head>
     <body>
 
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" href="#">Forum</a>
+                <a class="navbar-brand" href="/">Forum</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -17,16 +19,68 @@
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item"><a class="nav-link" href="/">Domov</a></li>
                         <li class="nav-item"><a class="nav-link" href="/cuteCat">Cute Maček</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('displayUserPage', username=username) }}">Profil</a></li>
                         <li class="nav-item"><a class="nav-link" href="/logout">Odjava</a></li>
+                        <li>
+                            <form class="d-flex" id="searchForm" method="GET" action="/search">
+                                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query">
+                                <button class="btn btn-outline-success" type="submit">Search</button>
+                            </form>
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
 
-        <h1>Tukaj bodo napisane novi dodatki ali bug fix-i spletne strani</h1>
+        <h1 class="m-4 text-center">Tukaj bodo napisane novi dodatki ali bug fix-i spletne strani</h1>
         
 
-        <form action="">Add text area for requests</form>
+        <div class="container">
+            <div class="row">
+                <!-- Bug and Fix Release Content -->
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            Bug Fixes and Updates
+                        </div>
+                        <div class="card-body">
+                            <ul>
+                                <li>Fixed navigation bar responsiveness on mobile devices.</li>
+                                <li>Resolved issue with user profile image upload.</li>
+                                <li>Improved search functionality for better accuracy.</li>
+                                <li>Patched security vulnerability in login system.</li>
+                                <li>Updated forum post editor for better user experience.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Request Form -->
+                <div class="col-md-4">
+                    <div class="sticky-top" style="top: 20px;">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                Feature Request
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" action="/requestFeature">
+                                    <div class="mb-3">
+                                        <label for="featureTitle" class="form-label">Feature Title</label>
+                                        <input type="text" class="form-control" id="featureTitle" name="featureTitle" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="featureDescription" class="form-label">Description</label>
+                                        <textarea class="form-control" id="featureDescription" name="featureDescription" rows="4" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">Submit Request</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </html>

@@ -46,7 +46,7 @@
 4. Ustno izročilo
 
 ## TODO List:
-1. Search function
+1. Search function ✓
 2. Main database ✓
 3. User profiles ✓
 4. Thread Creation ✓

@@ -1,4 +1,3 @@
-Page.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,8 +8,12 @@ Page.html
     <style>
         body {
             background-color: #f4f4f4;
-            padding-top: 20px;
         }
+        
+        .container{
+            margin-top: 20px;
+        }
+
         .edit-container {
             max-width: 600px;
             margin: auto;
@@ -35,7 +38,7 @@ Page.html
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">Forum</a>
+            <a class="navbar-brand" href="/">Forum</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -43,7 +46,14 @@ Page.html
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="/">Domov</a></li>
                     <li class="nav-item"><a class="nav-link" href="/cuteCat">Cute Maček</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('displayUserPage', username=username) }}">Profil</a></li>
                     <li class="nav-item"><a class="nav-link" href="/logout">Odjava</a></li>
+                    <li>
+                        <form class="d-flex" id="searchForm" method="GET" action="/search">
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </div>
