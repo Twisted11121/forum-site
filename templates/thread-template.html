@@ -16,6 +16,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a id="adminDashboard" class="nav-link" href="/adminDashboard" style="display: none;">Admin Dashboard</a></li>
+                    <li class="nav-item"><a id="requests" class="nav-link" href="/displayRequests" style="display: none;">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="/">Domov</a></li>
                     <li class="nav-item"><a class="nav-link" href="/cuteCat">Cute Maček</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('displayUserPage', username=username) }}">Profil</a></li>
@@ -40,10 +42,13 @@
                 </div>
                 <h3 id="thread-title">{{ thread[1] }}</h3> 
                 <p id="thread-content">{{ thread[2] }}</p> 
+                <button id="delete1" onclick="deleteThread()" style="display: none;">Delete Thread</button>
             </div>
+            
+
         </div>
 
-        <h4>Replies</h4>
+        <h4>Komentarji</h4>
         <div id="replies-list" class="list-group mb-4">
             {% for comment in comments %}
             <div class="list-group-item d-flex">
@@ -75,4 +80,55 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+<script>
+
+        $(document).ready(function() {
+            const username = "{{ loggedInUser }}";
+            const deleteButton = document.getElementById('delete1');
+            const creator = "{{ thread[3] }}";
+
+            if (username == creator) {
+                deleteButton.style.display = 'block';
+            } else {
+                deleteButton.style.display = 'none';
+            };
+        });
+
+
+    function deleteThread() {
+        const username = "{{ username }}";
+        const threadId = "{{ thread[0] }}";
+        $.ajax({
+            url: "/deleteThread",
+            method: 'POST',
+            data: {
+                username: username,
+                threadId: threadId
+            },
+            success: function(result) {
+                alert("Thread deleted successfully.");
+                window.location.href = "/";
+            }
+        });
+    };
+
+    $(document).ready(function() {
+        const username = "{{ username }}";
+        const adminButton = document.getElementById('adminDashboard');
+        const requestButton = document.getElementById('requests');
+        $.ajax({
+            url: "/adminDashboard",
+            method: 'GET',
+            data: {
+                username: username
+            },
+            success: function(result) {
+                adminButton.textContent = "Admin Dashboard";
+                adminButton.style.display = 'block';
+                requestButton.textContent = "Requests";
+                requestButton.style.display = 'block';
+            },
+        });
+    });
+</script>
 </html>

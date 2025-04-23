@@ -83,16 +83,26 @@ def index():
     return render_template('login_page.html')
 
 @app.route('/displayThreads')
+
+#Fix the displayThreads function to show the number of comments for each thread
+#problem is when deleting threads the id of the thread doesnt update and we need a dictionary to show the number of comments for each thread
+
 def displayThreads():
     con = sqlite3.connect(database)
     cur = con.cursor()
+    threads1 = cur.execute('SELECT count(*) FROM threads').fetchall()
     threads = cur.execute('SELECT * FROM threads').fetchall()
+    comments = []
+    for x in range(0, threads1[0][0]):
+        comments.append(cur.execute('SELECT count(*) FROM comments WHERE thread_id = ?', (threads[x][0],)).fetchall())
     con.close()
+    
+    print(comments)
     
     username = session['username']
     
 
-    return render_template('threads.html', threads=threads, username=username)
+    return render_template('threads.html', threads=threads, username=username, comments=comments)
 
 @app.route("/login", methods=['POST'])
 def login():
@@ -195,7 +205,7 @@ def thread(thread_id):
             commentPics[commUsername] = clean_url_com
         conLog.close()
         con.close()
-        return render_template('thread-template.html', thread=thread, comments=comments, userPic=clean_url, commentPics=commentPics)
+        return render_template('thread-template.html', thread=thread, comments=comments, userPic=clean_url, commentPics=commentPics, loggedInUser=session['username'])
 
     conLog.close()
     con.close()
@@ -284,14 +294,14 @@ def novice():
         return redirect(url_for('displayRequests'))
         
     
-    return render_template('novice.html')
+    return render_template('novice.html', username=session['username'])
 
 @app.route('/cuteCat')
 def getCat():
     img_url = requests.get("https://cataas.com/cat?json=true").json()
     image=f"https://cataas.com/cat/{img_url["id"]}"
     
-    return render_template('cuteCat.html', img=image)
+    return render_template('cuteCat.html', img=image, username=session['username'])
 
 
 @app.route('/search', methods=['GET'])
@@ -307,7 +317,7 @@ def search():
     
     con.close()
     
-    return render_template('search.html', threads=threads, query=query)
+    return render_template('search.html', threads=threads, query=query, username=session['username'])
 
 
 @app.route('/requestFeature', methods=['POST'])
@@ -322,7 +332,7 @@ def storeRequest():
     cur.execute('INSERT INTO fRequests (username, title, content) VALUES (?, ?, ?)', (username, title, content))
     con.commit()
     con.close()
-    return render_template('novice.html')
+    return render_template('novice.html', username=session['username'])
 
 @app.route('/adminDashboard', methods=['GET'])
 def adminDashboard():
@@ -333,20 +343,77 @@ def adminDashboard():
     role = cur.execute('SELECT role FROM login WHERE username = ?', (username,)).fetchone()
     
     if role or role[0] == 'admin':
-        return render_template('adminDashboard.html')
+        return render_template('adminDashboard.html', username=session['username'])
     else:
         return render_template('index.html')
 
+@app.route('/users', methods=['GET'])
+def users():
+    con = sqlite3.connect(login_db)
+    cur = con.cursor()
+    
+    if session['username'] == 'admin':
+           
+        users = cur.execute('SELECT username, userPic FROM login').fetchall()
+        
+        users = [(user[0], user[1]) for user in users]    
+        return render_template('users.html', users=users, username=session['username'])
+    
+    
+    con.close()    
+    return render_template('index.html')
+
+@app.route('/deleteUser', methods=['POST'])
+def deleteUser():
+    con = sqlite3.connect(login_db)
+    cur = con.cursor()
+    
+    username = request.form['username']
+    
+    cur.execute('DELETE FROM login WHERE username = ?', (username,))
+    con.commit()
+    con.close()
+    
+    return redirect(url_for('users'))
+
+
 @app.route('/displayRequests')
 def displayRequests():
-    con = sqlite3.connect(request_db)
+    con = sqlite3.connect(database)
     cur = con.cursor()
     
     requests = cur.execute('SELECT * FROM fRequests').fetchall()
-    
     con.close()
     
-    return render_template('feauture-requests.html', requests=requests)
+    return render_template('feauture-requests.html', requests=requests, username=session['username'])
+
+@app.route('/completedReqeuest', methods=['POST'])
+def completedRequest():
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    
+    request_id = request.form['id']
+    
+    cur.execute('DELETE FROM fRequests WHERE id = ?', (request_id,))
+    con.commit()
+    con.close()
+    
+    return redirect(url_for('displayRequests'))
+
+
+@app.route('/deleteThread', methods=['POST'])
+def deleteThread():
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    
+    thread_id = request.form.get('threadId')
+    
+    cur.execute('DELETE FROM threads WHERE id = ?', (thread_id,))
+    cur.execute('DELETE FROM comments WHERE thread_id = ?', (thread_id,))
+    con.commit()
+    con.close()
+    
+    return redirect(url_for('index'))
 
 
 if __name__ == "__main__":

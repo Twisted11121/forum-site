@@ -44,6 +44,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a id="adminDashboard" class="nav-link" href="/adminDashboard" style="display: none;">Admin Dashboard</a></li>
+                    <li class="nav-item"><a id="requests" class="nav-link" href="/displayRequests" style="display: none;">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="/">Domov</a></li>
                     <li class="nav-item"><a class="nav-link" href="/cuteCat">Cute Maček</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('displayUserPage', username=username) }}">Profil</a></li>
@@ -100,6 +102,26 @@
 </body>
 
 <script>
+
+$(document).ready(function() {
+        const username = "{{ username }}";
+        const adminButton = document.getElementById('adminDashboard');
+        const requestButton = document.getElementById('requests');
+        $.ajax({
+            
+            url: "/adminDashboard",
+            method: 'GET',
+            data: {
+                username: username
+            },
+            success: function(result) {
+                adminButton.textContent = "Admin Dashboard";
+                adminButton.style.display = 'block';
+                requestButton.textContent = "Requests";
+                requestButton.style.display = 'block';
+            },
+        });
+    });
 
     function redirectToUserPage() {
         window.location.href = "/user/{{ username }}";

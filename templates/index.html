@@ -16,7 +16,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li><a id="adminDashboard" href="/adminDashboard" style="display: none;">Admin Dashboard</a></li>
+                    <li class="nav-item"><a id="adminDashboard" class="nav-link" href="/adminDashboard" style="display: none;">Admin Dashboard</a></li>
+                    <li class="nav-item"><a id="requests" class="nav-link" href="/displayRequests" style="display: none;">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="/">Domov</a></li>
                     <li class="nav-item"><a class="nav-link" href="/cuteCat">Cute Maček</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('displayUserPage', username=username) }}">Profil</a></li>
@@ -50,8 +51,8 @@
 <script>
     $(document).ready(function() {
         const username = "{{ username }}";
-        const editButton = document.getElementById('adminDashboard');
-        
+        const adminButton = document.getElementById('adminDashboard');
+        const requestButton = document.getElementById('requests');
         $.ajax({
             
             url: "/adminDashboard",
@@ -60,8 +61,10 @@
                 username: username
             },
             success: function(result) {
-                editButton.textContent = "Admin Dashboard";
-                editButton.style.display = 'block';
+                adminButton.textContent = "Admin Dashboard";
+                adminButton.style.display = 'block';
+                requestButton.textContent = "Requests";
+                requestButton.style.display = 'block';
             },
         });
     });
