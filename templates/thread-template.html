@@ -10,7 +10,7 @@
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="/">Forum</a>
+            <a class="navbar-brand" href="/displayThreads">Forum</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -83,15 +83,27 @@
 <script>
 
         $(document).ready(function() {
-            const username = "{{ loggedInUser }}";
-            const deleteButton = document.getElementById('delete1');
-            const creator = "{{ thread[3] }}";
+        const deleteButton = document.getElementById('delete1');
+        const creator = "{{ thread[3] }}";
 
-            if (username == creator) {
-                deleteButton.style.display = 'block';
-            } else {
-                deleteButton.style.display = 'none';
-            };
+        $.ajax({
+            url: "/deleteThread",
+            method: 'GET',
+            data: {
+                creator: creator
+            },
+            success: function(result) {
+                if (result.success) {
+                    deleteButton.textContent = "Delete Thread";
+                    deleteButton.style.display = 'block';
+                    } else {
+                        console.log("User is not the creator.");
+                        deleteButton.style.display = 'none'; 
+                    }
+                },
+        });
+
+            
         });
 
 
@@ -116,6 +128,7 @@
         const username = "{{ username }}";
         const adminButton = document.getElementById('adminDashboard');
         const requestButton = document.getElementById('requests');
+
         $.ajax({
             url: "/adminDashboard",
             method: 'GET',

@@ -10,7 +10,7 @@
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="/">Forum</a>
+            <a class="navbar-brand" href="/displayThreads">Forum</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -43,7 +43,7 @@
                     <strong>{{ thread[1] }}</strong>
                 </a>
                 <p class="mb-1">{{ thread[2] }}</p>
-                <small>Objavil <a href="{{ url_for('displayUserPage', username=thread[3]) }}">{{ thread[3] }}</a> dne {{ thread[4] }} Število Komentarjev: {{ comments[thread[0]-1] }}</small>
+                <small>Objavil <a href="{{ url_for('displayUserPage', username=thread[3]) }}">{{ thread[3] }}</a> dne {{ thread[4] }} Število Komentarjev: {{ comments[thread[0]-1][0][0] }}</small>
             </li>
             {% endfor %}
         </ul>
@@ -57,6 +57,7 @@
 </body>
 
 <script>
+
         $(document).ready(function() {
         const username = "{{ username }}";
         const adminButton = document.getElementById('adminDashboard');

@@ -51,7 +51,7 @@ def thread_db():
     cur = con.cursor()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS threads (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
             title TEXT NOT NULL,
             content TEXT NOT NULL,
             creator TEXT NOT NULL,
@@ -67,6 +67,15 @@ def thread_db():
             FOREIGN KEY (thread_id) REFERENCES threads (id) ON DELETE CASCADE
         )
     ''')
+    
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS testi (
+            id INTEGER PRIMARY KEY,
+            predmet TEXT NOT NULL,
+            letnik INTEGER NOT NULL
+        )
+    ''')
+    
     con.commit()
     con.close()
 
@@ -98,7 +107,6 @@ def displayThreads():
     con.close()
     
     print(comments)
-    
     username = session['username']
     
 
@@ -401,20 +409,51 @@ def completedRequest():
     return redirect(url_for('displayRequests'))
 
 
-@app.route('/deleteThread', methods=['POST'])
+@app.route('/deleteThread', methods=['GET', 'POST'])
 def deleteThread():
+    
+    if request.method == 'GET':
+        creator = request.args.get('creator')
+        print(creator)
+        print(session['username'])
+        if session['username'] == creator:
+            return jsonify({'success': True, 'creator': creator})
+        else:
+            return jsonify({'error': False, 'creator': creator})
+        
+    
+    if request.method == 'POST':
+        con = sqlite3.connect(database)
+        cur = con.cursor()
+        
+        thread_id = request.form.get('threadId')
+        
+        cur.execute('DELETE FROM threads WHERE id = ?', (thread_id,))
+        cur.execute('DELETE FROM comments WHERE thread_id = ?', (thread_id,))
+        con.commit()
+        # Update the IDs of the remaining threads
+        cur.execute('''
+            UPDATE threads
+            SET id = id - 1
+            WHERE id > ?
+        ''', (thread_id,))
+        
+        con.commit()
+        con.close()
+        
+        return redirect(url_for('index'))
+
+
+@app.route('/testi')
+def test1():
     con = sqlite3.connect(database)
     cur = con.cursor()
     
-    thread_id = request.form.get('threadId')
     
-    cur.execute('DELETE FROM threads WHERE id = ?', (thread_id,))
-    cur.execute('DELETE FROM comments WHERE thread_id = ?', (thread_id,))
-    con.commit()
-    con.close()
+    username = session['username']
     
-    return redirect(url_for('index'))
 
+    return render_template('threads.html', username=username,)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
