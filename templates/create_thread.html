@@ -33,7 +33,7 @@
 </nav>
     
     <div class="container mt-4 flex-grow-1">
-        <h1>Create a New Thread</h1>
+        <h1 id="title1">Create a New Thread</h1>
         <form action="/create_thread" method="post">
             <div class="mb-3">
                 <label for="title" class="form-label">Thread Title:</label>
@@ -42,6 +42,10 @@
             <div class="mb-3">
                 <label for="content" class="form-label">Thread Content:</label>
                 <textarea id="content" name="content" class="form-control" rows="10" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="test" class="form-label">Add test image</label>
+                <input type="file" class="form-control" id="test" name="test" accept="image/*">
             </div>
             <button type="submit" class="btn btn-primary">Submit Thread</button>
         </form>
@@ -74,5 +78,16 @@ $(document).ready(function() {
         },
     });
 });
+
+if ("{{type}}" == "testi"){
+    var title1 = document.getElementById("title");
+    title1.textContent = "Create a New Test";
+    var title = document.getElementById("title");
+    title.setAttribute("placeholder", "Enter test name");
+    var content = document.getElementById("content");
+    content.setAttribute("placeholder", "Enter test description");
+
+}
+
 </script>
 </html>

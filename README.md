@@ -52,6 +52,7 @@
 4. Thread Creation ✓
 5. Moderation tools for admin
 6. Likes/Dislikes
-7. Handle users uploading images profile pictures ✓ and tests
+7. Handle users uploading images profile pictures ✓
 8. Add the profile button to the nav-bar.✓
+9. Add image button for creating test threads and to comments
 

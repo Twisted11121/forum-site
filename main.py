@@ -68,11 +68,17 @@ def thread_db():
         )
     ''')
     
+    
     cur.execute('''
         CREATE TABLE IF NOT EXISTS testi (
             id INTEGER PRIMARY KEY,
             predmet TEXT NOT NULL,
-            letnik INTEGER NOT NULL
+            letnik INTEGER NOT NULL, 
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            creator TEXT NOT NULL,
+            timestamp TIME NOT NULL,
+            testPic TEXT
         )
     ''')
     
@@ -110,7 +116,7 @@ def displayThreads():
     username = session['username']
     
 
-    return render_template('threads.html', threads=threads, username=username, comments=comments)
+    return render_template('threads.html', threads=threads, username=username, comments=comments, type="threads")
 
 @app.route("/login", methods=['POST'])
 def login():
@@ -431,7 +437,6 @@ def deleteThread():
         cur.execute('DELETE FROM threads WHERE id = ?', (thread_id,))
         cur.execute('DELETE FROM comments WHERE thread_id = ?', (thread_id,))
         con.commit()
-        # Update the IDs of the remaining threads
         cur.execute('''
             UPDATE threads
             SET id = id - 1
@@ -449,11 +454,71 @@ def test1():
     con = sqlite3.connect(database)
     cur = con.cursor()
     
-    
+    threads = cur.execute('SELECT * FROM testi').fetchall()
     username = session['username']
-    
+        
 
-    return render_template('threads.html', username=username,)
+    return render_template('threads.html', username=username, threads=threads, type="testi")
+
+@app.route('/create_testi', methods=['GET', 'POST'])
+def create_testi():
+    if request.method == 'POST':
+        predmet = request.form['predmet']
+        letnik = request.form['letnik']
+        title = request.form['title']
+        content = request.form['content']
+        username = session['username']
+        now1 = datetime.now()
+        formatted_date_time = now1.strftime("%d/%m/%Y %H:%M")
+        testPic = request.files.get('test', None)
+        
+        file_path = os.path.join("testPics", testPic.filename)
+        testPic.save(file_path)
+
+        con = sqlite3.connect(database)
+        cur = con.cursor()
+        cur.execute('INSERT INTO testi (predmet, letnik, title, content, creator, timestamp, testPic) VALUES (?, ?, ?, ?, ?, ?)', (predmet, letnik, title, content, username, formatted_date_time, testPic.filename))
+        con.commit()
+        con.close()
+        
+        return redirect(url_for('testi'))
+    return render_template('create_thread.html', type="testi")
+
+@app.route('/testi/<int:test_id>', methods=['GET', 'POST'])
+def testi(test_id):
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    conLog = sqlite3.connect(login_db)
+    curLog = conLog.cursor()
+
+    if request.method == 'POST':
+        content = request.form['content']
+        username = session['username']  
+
+        cur.execute('INSERT INTO comments (thread_id, username, content) VALUES (?, ?, ?)', (test_id, username, content))
+        con.commit()
+
+    creator = cur.execute('SELECT creator FROM testi WHERE id = ?', (test_id,)).fetchone()
+    thread = cur.execute('SELECT * FROM testi WHERE id = ?', (test_id,)).fetchone()
+    comments = cur.execute('SELECT * FROM comments WHERE thread_id = ?', (test_id,)).fetchall()
+    userPic = curLog.execute('SELECT userPic FROM login WHERE username = ?', (creator)).fetchone()
+    clean_url = re.sub(r"[()',]", "", str(userPic))
+    
+    if comments:
+        commentPics = {}
+        for comment in comments:
+            commUsername = comment[2]
+            commentPic = curLog.execute('SELECT userPic FROM login WHERE username = ?', (commUsername,)).fetchone()
+            clean_url_com = re.sub(r"[()',]", "", str(commentPic)) if commentPic else "default-avatar.jpg"
+            commentPics[commUsername] = clean_url_com
+        conLog.close()
+        con.close()
+        return render_template('thread-template.html', thread=thread, comments=comments, userPic=clean_url, commentPics=commentPics, loggedInUser=session['username'])
+
+    conLog.close()
+    con.close()
+
+    return render_template('thread-template.html', thread=thread, userPic=clean_url)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

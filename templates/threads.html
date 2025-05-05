@@ -35,7 +35,7 @@
     
     <div class="container mt-4 flex-grow-1">
         <h1>Forum Threads</h1>
-        <a href="/create_thread" class="btn btn-primary mb-3">Ustvari nov thread</a>
+        <a href="/create_thread" class="btn btn-primary mb-3" id="create">Ustvari nov thread</a>
         <ul class="list-group">
             {% for thread in threads %}
             <li class="list-group-item">
@@ -77,6 +77,15 @@
             },
         });
     });
+
+    var createButton = document.getElementById("create");
+    if ("{{ type }}" == "thread") {
+        createButton.setAttribute("href", "/create_thread");
+    } else if ("{{ type }}" == "testi") {
+        createButton.setAttribute("href", "/create_testi");
+    }
+
+
 </script>
 
 </html>
