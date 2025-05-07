@@ -55,4 +55,5 @@
 7. Handle users uploading images profile pictures ✓
 8. Add the profile button to the nav-bar.✓
 9. Add image button for creating test threads and to comments
+10. Fix the test, make it its own template.
 

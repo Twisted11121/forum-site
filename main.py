@@ -4,6 +4,8 @@ from datetime import datetime
 import re
 import requests
 import os
+from urllib.parse import quote
+
 
 app = Flask(__name__)
 database = 'threads.db'
@@ -68,7 +70,6 @@ def thread_db():
         )
     ''')
     
-    
     cur.execute('''
         CREATE TABLE IF NOT EXISTS testi (
             id INTEGER PRIMARY KEY,
@@ -79,6 +80,16 @@ def thread_db():
             creator TEXT NOT NULL,
             timestamp TIME NOT NULL,
             testPic TEXT
+        )
+    ''')
+    
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS test_comments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            test_id INTEGER NOT NULL,
+            username TEXT NOT NULL,
+            content TEXT NOT NULL,
+            FOREIGN KEY (test_id) REFERENCES testi (id) ON DELETE CASCADE
         )
     ''')
     
@@ -99,9 +110,6 @@ def index():
 
 @app.route('/displayThreads')
 
-#Fix the displayThreads function to show the number of comments for each thread
-#problem is when deleting threads the id of the thread doesnt update and we need a dictionary to show the number of comments for each thread
-
 def displayThreads():
     con = sqlite3.connect(database)
     cur = con.cursor()
@@ -112,7 +120,6 @@ def displayThreads():
         comments.append(cur.execute('SELECT count(*) FROM comments WHERE thread_id = ?', (threads[x][0],)).fetchall())
     con.close()
     
-    print(comments)
     username = session['username']
     
 
@@ -321,7 +328,6 @@ def getCat():
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query')
-    print(query)
     if not query:
         query = ""
     con = sqlite3.connect(database)
@@ -420,8 +426,6 @@ def deleteThread():
     
     if request.method == 'GET':
         creator = request.args.get('creator')
-        print(creator)
-        print(session['username'])
         if session['username'] == creator:
             return jsonify({'success': True, 'creator': creator})
         else:
@@ -449,6 +453,11 @@ def deleteThread():
         return redirect(url_for('index'))
 
 
+@app.route('/testPics/<path:filename>')
+def test_pictures(filename):
+    return send_from_directory('testPics', filename)
+
+
 @app.route('/testi')
 def test1():
     con = sqlite3.connect(database)
@@ -456,32 +465,48 @@ def test1():
     
     threads = cur.execute('SELECT * FROM testi').fetchall()
     username = session['username']
-        
+    threads1 = cur.execute('SELECT count(*) FROM testi').fetchall()
 
-    return render_template('threads.html', username=username, threads=threads, type="testi")
+    
+    comments = []
+    for x in range(0, threads1[0][0]):
+        comments.append(cur.execute('SELECT count(*) FROM comments WHERE thread_id = ?', (threads[x][0],)).fetchall())
+    con.close()
+    
+    username = session['username']
+
+    return render_template('threads.html', username=username, comments=comments, threads=threads, type="testi")
 
 @app.route('/create_testi', methods=['GET', 'POST'])
 def create_testi():
     if request.method == 'POST':
-        predmet = request.form['predmet']
-        letnik = request.form['letnik']
+        predmet = request.form.get('predmet', None)
+        letnik = request.form.get('letnik', 1)
         title = request.form['title']
         content = request.form['content']
         username = session['username']
         now1 = datetime.now()
         formatted_date_time = now1.strftime("%d/%m/%Y %H:%M")
-        testPic = request.files.get('test', None)
-        
-        file_path = os.path.join("testPics", testPic.filename)
-        testPic.save(file_path)
+        testPic = request.files.get('test')
+        directory = 'testPic'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
+        filename = None
+        if testPic and testPic.filename != '':
+            formatted_filename = re.sub(r'\s+', '_', testPic.filename)
+            formatted_filename = re.sub(r'[^\w\.-]', '', formatted_filename)
+            file_path = os.path.join("testPic", formatted_filename)
+            testPic.save(file_path)
+            filename = formatted_filename
         con = sqlite3.connect(database)
         cur = con.cursor()
-        cur.execute('INSERT INTO testi (predmet, letnik, title, content, creator, timestamp, testPic) VALUES (?, ?, ?, ?, ?, ?)', (predmet, letnik, title, content, username, formatted_date_time, testPic.filename))
+        cur.execute('INSERT INTO testi (predmet, letnik, title, content, creator, timestamp, testPic) VALUES (?, ?, ?, ?, ?, ?, ?)', (predmet, letnik, title, content, username, formatted_date_time, filename))
         con.commit()
         con.close()
         
-        return redirect(url_for('testi'))
+        return redirect(url_for('test1'))
+
     return render_template('create_thread.html', type="testi")
 
 @app.route('/testi/<int:test_id>', methods=['GET', 'POST'])
@@ -500,10 +525,9 @@ def testi(test_id):
 
     creator = cur.execute('SELECT creator FROM testi WHERE id = ?', (test_id,)).fetchone()
     thread = cur.execute('SELECT * FROM testi WHERE id = ?', (test_id,)).fetchone()
-    comments = cur.execute('SELECT * FROM comments WHERE thread_id = ?', (test_id,)).fetchall()
+    comments = cur.execute('SELECT * FROM test_comments WHERE test_id = ?', (test_id,)).fetchall()
     userPic = curLog.execute('SELECT userPic FROM login WHERE username = ?', (creator)).fetchone()
     clean_url = re.sub(r"[()',]", "", str(userPic))
-    
     if comments:
         commentPics = {}
         for comment in comments:
@@ -517,7 +541,7 @@ def testi(test_id):
 
     conLog.close()
     con.close()
-
+    print(thread[7])
     return render_template('thread-template.html', thread=thread, userPic=clean_url)
 
 if __name__ == "__main__":

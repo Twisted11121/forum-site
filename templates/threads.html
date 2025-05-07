@@ -39,11 +39,11 @@
         <ul class="list-group">
             {% for thread in threads %}
             <li class="list-group-item">
-                <a href="{{ url_for('thread', thread_id=thread[0]) }}">
+                <a href="{{ url_for('testi', test_id=thread[0]) }}">
                     <strong>{{ thread[1] }}</strong>
                 </a>
                 <p class="mb-1">{{ thread[2] }}</p>
-                <small>Objavil <a href="{{ url_for('displayUserPage', username=thread[3]) }}">{{ thread[3] }}</a> dne {{ thread[4] }} Število Komentarjev: {{ comments[thread[0]-1][0][0] }}</small>
+                <small id="botom">Objavil <a href="{{ url_for('displayUserPage', username=thread[3]) }}">{{ thread[3] }}</a> dne {{ thread[4] }} Število Komentarjev: {{ comments[thread[0]-1][0][0] }}</small>
             </li>
             {% endfor %}
         </ul>
@@ -77,6 +77,8 @@
             },
         });
     });
+
+    
 
     var createButton = document.getElementById("create");
     if ("{{ type }}" == "thread") {

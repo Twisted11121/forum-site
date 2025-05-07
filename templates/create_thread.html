@@ -34,7 +34,7 @@
     
     <div class="container mt-4 flex-grow-1">
         <h1 id="title1">Create a New Thread</h1>
-        <form action="/create_thread" method="post">
+        <form action="/create_thread" method="post" enctype="multipart/form-data" id="create_thread">
             <div class="mb-3">
                 <label for="title" class="form-label">Thread Title:</label>
                 <input type="text" id="title" name="title" class="form-control" required>
@@ -44,8 +44,11 @@
                 <textarea id="content" name="content" class="form-control" rows="10" required></textarea>
             </div>
             <div class="mb-3">
-                <label for="test" class="form-label">Add test image</label>
-                <input type="file" class="form-control" id="test" name="test" accept="image/*">
+                <label for="test" class="form-label">Change Profile Picture</label>
+                <input type="file" class="form-control" id="test" name="test" accept="image/*" required>
+            <div class="mb-3">
+                <label for="predmet" class="form-label">Ime predmeta:</label>
+                <input type="text" id="predmet" name="predmet" class="form-control" required placeholder="Ime Predmeta">
             </div>
             <button type="submit" class="btn btn-primary">Submit Thread</button>
         </form>
@@ -80,14 +83,14 @@ $(document).ready(function() {
 });
 
 if ("{{type}}" == "testi"){
+    var action = document.getElementById("create_thread");
+    action.setAttribute("action", "/create_testi");
     var title1 = document.getElementById("title");
     title1.textContent = "Create a New Test";
     var title = document.getElementById("title");
     title.setAttribute("placeholder", "Enter test name");
     var content = document.getElementById("content");
     content.setAttribute("placeholder", "Enter test description");
-
 }
-
 </script>
 </html>
