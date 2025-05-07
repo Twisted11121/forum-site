@@ -50,10 +50,12 @@
 2. Main database ✓
 3. User profiles ✓
 4. Thread Creation ✓
-5. Moderation tools for admin
-6. Likes/Dislikes
+5. Moderation tools for admin ✓
 7. Handle users uploading images profile pictures ✓
 8. Add the profile button to the nav-bar.✓
-9. Add image button for creating test threads and to comments
-10. Fix the test, make it its own template.
+9. Add image button for creating test threads✓
+10. Fix the test, make it its own template. ✓
+11. Add the ability to post images on test threads 
+12. Add the delete thread option to admin dashboard for deleteing test threads
+13. add delete button to comments
 

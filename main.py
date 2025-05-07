@@ -70,6 +70,9 @@ def thread_db():
         )
     ''')
     
+    #cur.execute('DROP TABLE IF EXISTS testi')
+    #cur.execute('DROP TABLE IF EXISTS test_comments')
+    
     cur.execute('''
         CREATE TABLE IF NOT EXISTS testi (
             id INTEGER PRIMARY KEY,
@@ -243,6 +246,7 @@ def displayUserPage(username):
     userPic = cur.execute('SELECT userPic FROM login WHERE username = ?', (username,)).fetchone()
     bio = cur.execute('SELECT bio FROM login WHERE username = ?', (username,)).fetchone()
     threads = cur_T.execute('SELECT id, title, timestamp FROM threads WHERE creator = ?', (username,)).fetchall()
+    test = cur_T.execute('SELECT id, title, timestamp FROM testi WHERE creator = ?', (username,)).fetchall()
     
     clean_userPic = re.sub(r"[()',]", "", str(userPic))
     clean_bio = re.sub(r"[()',]", "", str(bio))
@@ -254,7 +258,8 @@ def displayUserPage(username):
                          username=username, 
                          userPic=clean_userPic, 
                          bio=clean_bio, 
-                         threads=threads)
+                         threads=threads,
+                         tests=test)
 
 
 @app.route('/editPage', methods=['GET'])
@@ -455,7 +460,7 @@ def deleteThread():
 
 @app.route('/testPics/<path:filename>')
 def test_pictures(filename):
-    return send_from_directory('testPics', filename)
+    return send_from_directory('testPic', filename)
 
 
 @app.route('/testi')
@@ -475,7 +480,7 @@ def test1():
     
     username = session['username']
 
-    return render_template('threads.html', username=username, comments=comments, threads=threads, type="testi")
+    return render_template('show-tests.html', username=username, comments=comments, threads=threads, type="testi")
 
 @app.route('/create_testi', methods=['GET', 'POST'])
 def create_testi():
@@ -542,7 +547,7 @@ def testi(test_id):
     conLog.close()
     con.close()
     print(thread[7])
-    return render_template('thread-template.html', thread=thread, userPic=clean_url)
+    return render_template('test-template.html', thread=thread, userPic=clean_url)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

@@ -35,11 +35,11 @@
     
     <div class="container mt-4 flex-grow-1">
         <h1>Forum Threads</h1>
-        <a href="/create_thread" class="btn btn-primary mb-3" id="create">Ustvari nov thread</a>
+        <a href="/create_testi" class="btn btn-primary mb-3" id="create">Ustvari nov thread</a>
         <ul class="list-group">
             {% for thread in threads %}
             <li class="list-group-item">
-                <a href="{{ url_for('thread', thread_id=thread[0]) }}">
+                <a href="{{ url_for('testi', test_id=thread[0]) }}">
                     <strong>{{ thread[1] }}</strong>
                 </a>
                 <p class="mb-1">{{ thread[2] }}</p>

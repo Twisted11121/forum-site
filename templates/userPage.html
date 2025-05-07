@@ -122,7 +122,7 @@
 
 <div class="container">
     <div class="user-header">
-        <img src="{{ url_for('test_pictures', filename=thread[8]) }}" alt="User Picture">
+        <img src="{{ url_for('user_pictures', filename=userPic) }}" alt="User Picture">
         <div>
             <h1 id="username">{{ username }}</h1>
             <p class="bio">{{ bio }}</p>
@@ -145,6 +145,23 @@
             <li>No threads posted yet.</li>
         {% endif %}
     </ul>
+
+    <h2>Posted Tests</h2>
+    <ul class="threads">
+        {% if tests %}
+            {% for test in tests %}
+            <li>
+                <div class="thread-info">
+                    <a href="{{ url_for('testi', test_id=test[0]) }}">{{ test[1] }}</a>
+                    <small class="text-muted">Posted on {{ test[2] }}</small>
+                </div>
+            </li>
+            {% endfor %}
+        {% else %}
+            <li>No test posted yet.</li>
+        {% endif %}
+    </ul>
+
 </div>
 
 </body>
