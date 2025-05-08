@@ -457,6 +457,31 @@ def deleteThread():
         
         return redirect(url_for('index'))
 
+@app.route("/deleteComment", methods=['POST'])
+def deleteComment():
+    con = sqlite3.connect(database)
+    cur = con.cursor()
+    
+    post_id = request.form['postId']
+    type1 = request.form['type']
+    comment_id = request.form['commentId']
+    user = request.form['loggedInUser']
+    if type1 == "test":
+        creator = cur.execute('SELECT username FROM test_comments WHERE id = ?', (comment_id,)).fetchone()
+        if session['username'] == 'admin' or user == creator[0]:
+            cur.execute('DELETE FROM test_comments WHERE id = ?', (comment_id,))
+            con.commit()
+            con.close()
+            return redirect(url_for('testi', test_id=post_id))
+    else:
+        creator  = cur.execute('SELECT username FROM comments WHERE id = ?', (comment_id,)).fetchone()
+        if session['username'] == 'admin' or user == creator[0]:
+            cur.execute('DELETE FROM comments WHERE id = ?', (comment_id,))
+            con.commit()
+            con.close()
+            return redirect(url_for('thread', thread_id=post_id))
+
+
 
 @app.route('/testPics/<path:filename>')
 def test_pictures(filename):
@@ -525,7 +550,7 @@ def testi(test_id):
         content = request.form['content']
         username = session['username']  
 
-        cur.execute('INSERT INTO comments (thread_id, username, content) VALUES (?, ?, ?)', (test_id, username, content))
+        cur.execute('INSERT INTO test_comments (test_id, username, content) VALUES (?, ?, ?)', (test_id, username, content))
         con.commit()
 
     creator = cur.execute('SELECT creator FROM testi WHERE id = ?', (test_id,)).fetchone()
@@ -542,7 +567,7 @@ def testi(test_id):
             commentPics[commUsername] = clean_url_com
         conLog.close()
         con.close()
-        return render_template('thread-template.html', thread=thread, comments=comments, userPic=clean_url, commentPics=commentPics, loggedInUser=session['username'])
+        return render_template('test-template.html', thread=thread, comments=comments, userPic=clean_url, commentPics=commentPics, loggedInUser=session['username'])
 
     conLog.close()
     con.close()

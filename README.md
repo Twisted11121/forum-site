@@ -55,7 +55,7 @@
 8. Add the profile button to the nav-bar.✓
 9. Add image button for creating test threads✓
 10. Fix the test, make it its own template. ✓
-11. Add the ability to post images on test threads 
+11. Add the ability to post images on test threads ✓ 
 12. Add the delete thread option to admin dashboard for deleteing test threads
-13. add delete button to comments
+13. add delete button to comments ✓ 
 

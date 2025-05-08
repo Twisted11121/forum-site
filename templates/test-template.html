@@ -52,15 +52,18 @@
         <h4>Komentarji</h4>
         <div id="replies-list" class="list-group mb-4">
             {% for comment in comments %}
-            <div class="list-group-item d-flex">
-            <div class="me-2 text-center d-flex flex-column align-items-center">
-                <img src="{{ url_for('user_pictures', filename=commentPics[comment[2]]) }}" class="rounded-circle mb-2" alt="User Avatar" width="70" height="70">
-                <strong><a href="{{ url_for('displayUserPage', username=comment[2]) }}">{{ comment[2] }}</a></strong> 
+            <div class="list-group-item d-flex align-items-start">
+            <div class="me-3 text-center d-flex flex-column align-items-center">
+                <img src="{{ url_for('user_pictures', filename=commentPics[comment[2]]) }}" class="rounded-circle mb-2 shadow-sm" alt="User Avatar" width="70" height="70">
+                <strong><a href="{{ url_for('displayUserPage', username=comment[2]) }}" class="text-decoration-none">{{ comment[2] }}</a></strong>
             </div>
             <div class="flex-grow-1">
-                <div class="border p-2">
-                <p class="mb-0">{{ comment[3] }}</p> 
+                <div class="border rounded p-3 bg-light shadow-sm">
+                <p class="mb-0 text-secondary">{{ comment[3] }}</p>
                 </div>
+                {% if loggedInUser == comment[2] or loggedInUser == "admin" %}
+                <button class="btn btn-sm btn-danger mt-2" onclick="deleteComment('{{ comment[0] }}')">Delete</button>
+                {% endif %}
             </div>
             </div>
             {% endfor %}
@@ -83,47 +86,22 @@
 </body>
 <script>
 
-        $(document).ready(function() {
-        const deleteButton = document.getElementById('delete1');
-        const creator = "{{ thread[3] }}";
-
+    function deleteComment(commentId) {
         $.ajax({
-            url: "/deleteThread",
-            method: 'GET',
-            data: {
-                creator: creator
-            },
-            success: function(result) {
-                if (result.success) {
-                    deleteButton.textContent = "Delete Thread";
-                    deleteButton.style.display = 'block';
-                    } else {
-                        console.log("User is not the creator.");
-                        deleteButton.style.display = 'none'; 
-                    }
-                },
-        });
-
-            
-        });
-
-
-    function deleteThread() {
-        const username = "{{ username }}";
-        const threadId = "{{ thread[0] }}";
-        $.ajax({
-            url: "/deleteThread",
+            url: "/deleteComment",
             method: 'POST',
             data: {
-                username: username,
-                threadId: threadId
+                username: "{{ loggedInUser }}",
+                type:'test',
+                postId: '{{ thread[0] }}',
+                commentId: commentId
             },
             success: function(result) {
-                alert("Thread deleted successfully.");
-                window.location.href = "/";
-            }
+                location.reload();
+            },
         });
-    };
+    }
+
 
     $(document).ready(function() {
         const username = "{{ username }}";
