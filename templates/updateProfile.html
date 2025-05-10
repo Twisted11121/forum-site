@@ -75,11 +75,6 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <textarea class="form-control" id="username" name="username" rows="3">{{ username }}</textarea>
-                </div>
-
-                <div class="mb-3">
                     <label for="bio" class="form-label">Bio</label>
                     <textarea class="form-control" id="bio" name="bio" rows="3" placeholder="{{ prevbio }}">{{ bio }}</textarea>
                 </div>
@@ -103,7 +98,7 @@
 
 <script>
 console.log(action.getAttribute("action")); // Should log "/create_testi" for testi
-$(document).ready(function() {
+        $(document).ready(function() {
         const username = "{{ username }}";
         const adminButton = document.getElementById('adminDashboard');
         const requestButton = document.getElementById('requests');

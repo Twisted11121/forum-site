@@ -43,14 +43,18 @@
                 <label for="content" class="form-label">Thread Content:</label>
                 <textarea id="content" name="content" class="form-control" rows="10" required></textarea>
             </div>
-            <div class="mb-3">
-                <label for="test" class="form-label">Change Profile Picture</label>
-                <input type="file" class="form-control" id="test" name="test" accept="image/*" required>
-            <div class="mb-3">
+            <div>
+            {% if type == "testi" %}
+            <div class="mb-3" id="slike"></div>
+                <label for="test" class="form-label">Slike</label>
+                <input type="file" class="form-control" id="test" name="test" accept="image/*" >
+            </div>
+            <div class="mb-3" id="predmet"></div>
                 <label for="predmet" class="form-label">Ime predmeta:</label>
                 <input type="text" id="predmet" name="predmet" class="form-control" required placeholder="Ime Predmeta">
             </div>
-            <button type="submit" class="btn btn-primary">Submit Thread</button>
+            {% endif %}</div>
+            <button type="submit" class="btn btn-primary" style="margin-left: 312px;">Submit Thread</button>
         </form>
         <a href="/" class="btn btn-secondary mt-3">Back to Threads</a>
     </div>
@@ -91,6 +95,10 @@ if ("{{type}}" == "testi"){
     title.setAttribute("placeholder", "Enter test name");
     var content = document.getElementById("content");
     content.setAttribute("placeholder", "Enter test description");
+    var slike = document.getElementById("slike");
+    slike.style.display = "block";
+    var predmet = document.getElementById("predmet");
+    predmet.style.display = "block";
 }
 </script>
 </html>

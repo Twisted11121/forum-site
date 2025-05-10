@@ -5,9 +5,18 @@ import re
 import requests
 import os
 from urllib.parse import quote
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 
 app = Flask(__name__)
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["50 per day", "10 per hour"]
+)
 database = 'threads.db'
 login_db = 'login.db'
 request_db = 'request.db'
@@ -39,11 +48,11 @@ def i_login_db():
                         role TEXT DEFAULT 'user'
                       )''')
     
-    """cur_login.execute('''
-                      INSERT INTO login 
-                      (username, password, userPic, bio)
-                      VALUES (?, ?, ?, ?)''',
-                      ("admin", "admin", "default-avatar.jpg", "Hello, I'm admin! :)"))"""
+    cur_login.execute('''
+        UPDATE login
+        SET role = "admin"
+        WHERE username = "admin"
+    ''')
     
     con_login.commit()
     con_login.close()
@@ -129,25 +138,32 @@ def displayThreads():
     return render_template('threads.html', threads=threads, username=username, comments=comments, type="threads")
 
 @app.route("/login", methods=['POST'])
+@limiter.limit("5 per minute")
 def login():
     con_login = sqlite3.connect(login_db)
     cur_login = con_login.cursor()
 
     if request.method == 'POST':
         username = request.form["username"]
-        password = request.form["password"]
+        input_password = request.form["password"]
 
         cur_login.execute("SELECT password FROM login WHERE username=?", (username,))
         result = cur_login.fetchone()
+        print(result)
+        print(input_password)
+        
 
-        if result is not None:
+        if result:
             stored_password = result[0]
-            if password == stored_password:
+            if check_password_hash(stored_password, input_password):
                 session['username'] = username
+                con_login.close()
                 return jsonify(success=True)
             else:
+                con_login.close()
                 return jsonify(success=False, error="Invalid username or password"), 401
         else:
+            con_login.close()
             return jsonify(success=False, error="Invalid username or password"), 401
 
 @app.route('/registerPage')
@@ -162,10 +178,12 @@ def register():
     username = request.form["username"]
     password = request.form["password"]
     
+    hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
+    
     defaultUserPic = "default-avatar.jpg"
     bio = "Hello, I'm new here! :)"
 
-    cur_login.execute("INSERT INTO login (username, password, userPic, bio) VALUES (?, ?, ?, ?)", (username, password, defaultUserPic, bio))
+    cur_login.execute("INSERT INTO login (username, password, userPic, bio) VALUES (?, ?, ?, ?)", (username, hashed_pw, defaultUserPic, bio))
     con_login.commit()
     con_login.close()
     return jsonify({'success': True})
@@ -465,7 +483,7 @@ def deleteComment():
     post_id = request.form['postId']
     type1 = request.form['type']
     comment_id = request.form['commentId']
-    user = request.form['loggedInUser']
+    user = request.form['username']
     if type1 == "test":
         creator = cur.execute('SELECT username FROM test_comments WHERE id = ?', (comment_id,)).fetchone()
         if session['username'] == 'admin' or user == creator[0]:
