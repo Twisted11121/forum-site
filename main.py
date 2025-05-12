@@ -138,7 +138,7 @@ def displayThreads():
     return render_template('threads.html', threads=threads, username=username, comments=comments, type="threads")
 
 @app.route("/login", methods=['POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("5 per hour")
 def login():
     con_login = sqlite3.connect(login_db)
     cur_login = con_login.cursor()
@@ -535,21 +535,29 @@ def create_testi():
         username = session['username']
         now1 = datetime.now()
         formatted_date_time = now1.strftime("%d/%m/%Y %H:%M")
-        testPic = request.files.get('test')
+        
+        
         directory = 'testPic'
         if not os.path.exists(directory):
             os.makedirs(directory)
+            
+        testPic = request.files.getlist('test')
+        print(testPic)
+        uploaded_files = []
+        for file in testPic:
+            print("File name:", file.filename)
+            if file and file.filename != '':
+                formatted_filename = re.sub(r'\s+', '_', file.filename)
+                formatted_filename = re.sub(r'[^\w\.-]', '', formatted_filename)
+                file_path = os.path.join(directory, formatted_filename)
+                file.save(file_path)
+                uploaded_files.append(formatted_filename)
 
-        filename = None
-        if testPic and testPic.filename != '':
-            formatted_filename = re.sub(r'\s+', '_', testPic.filename)
-            formatted_filename = re.sub(r'[^\w\.-]', '', formatted_filename)
-            file_path = os.path.join("testPic", formatted_filename)
-            testPic.save(file_path)
-            filename = formatted_filename
+        uploaded_files_str = ','.join(uploaded_files)
+        print(uploaded_files_str)
         con = sqlite3.connect(database)
         cur = con.cursor()
-        cur.execute('INSERT INTO testi (predmet, letnik, title, content, creator, timestamp, testPic) VALUES (?, ?, ?, ?, ?, ?, ?)', (predmet, letnik, title, content, username, formatted_date_time, filename))
+        cur.execute('INSERT INTO testi (predmet, letnik, title, content, creator, timestamp, testPic) VALUES (?, ?, ?, ?, ?, ?, ?)', (predmet, letnik, title, content, username, formatted_date_time, uploaded_files_str))
         con.commit()
         con.close()
         

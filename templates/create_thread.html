@@ -47,11 +47,11 @@
             {% if type == "testi" %}
             <div class="mb-3" id="slike"></div>
                 <label for="test" class="form-label">Slike</label>
-                <input type="file" class="form-control" id="test" name="test" accept="image/*" >
+                <input type="file" class="form-control" id="test" name="test" accept="image/*" multiple>
             </div>
             <div class="mb-3" id="predmet"></div>
                 <label for="predmet" class="form-label">Ime predmeta:</label>
-                <input type="text" id="predmet" name="predmet" class="form-control" required placeholder="Ime Predmeta">
+                <input type="text" id="predmet" name="predmet" class="form-control" required placeholder="Ime Predmeta" >
             </div>
             {% endif %}</div>
             <button type="submit" class="btn btn-primary" style="margin-left: 312px;">Submit Thread</button>

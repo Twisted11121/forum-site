@@ -42,7 +42,14 @@
                 </div>
                 <h3 id="thread-title">{{ thread[1] }}</h3> 
                 <p id="thread-content">{{ thread[2] }}</p> 
-                <img src="{{ url_for('test_pictures', filename=thread[7]) }}" alt="test_picture">
+                {% if thread[7] %}
+                {% set images = thread[7].split(',') %}
+                <div class="image-gallery">
+                    {% for image in images %}
+                        <img src="{{ url_for('test_pictures', filename=image) }}" alt="test_picture" class="img-fluid mb-3" style="max-width: 100%; height: auto;">
+                    {% endfor %}
+                </div>
+            {% endif %}
                 <button id="delete1" onclick="deleteThread()" style="display: none;">Delete Thread</button>
             </div>
             
@@ -85,6 +92,27 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 <script>
+
+    $(document).ready(function() {
+        const deleteButton = document.getElementById('delete1');
+        const creator = "{{ thread[3] }}";
+
+        $.ajax({
+            url: "/deleteThread",
+            method: 'GET',
+            data: {
+                creator: creator
+            },
+            success: function(result) {
+                if (result.success) {
+                    deleteButton.textContent = "Delete Thread";
+                    deleteButton.style.display = 'block';
+                    } else {
+                        console.log("User is not the creator.");
+                        deleteButton.style.display = 'none'; 
+                    }
+                },
+        });
 
     function deleteComment(commentId) {
         $.ajax({
