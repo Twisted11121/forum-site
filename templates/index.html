@@ -16,7 +16,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a id="adminDashboard" class="nav-link" href="/adminDashboard" style="display: none;">Admin Dashboard</a></li>
+                    <li class="nav-item"><a id="adminDashboard" class="nav-link" href="/adminDashboard2" style="display: none;">Admin Dashboard</a></li>
                     <li class="nav-item"><a id="requests" class="nav-link" href="/displayRequests" style="display: none;">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="/">Domov</a></li>
                     <li class="nav-item"><a class="nav-link" href="/cuteCat">Cute Maček</a></li>
@@ -61,11 +61,15 @@
                 username: username
             },
             success: function(result) {
+                console.log(result);
                 adminButton.textContent = "Admin Dashboard";
                 adminButton.style.display = 'block';
                 requestButton.textContent = "Requests";
                 requestButton.style.display = 'block';
             },
+            error: function(xhr, status, error) {
+                console.log("Error fetching admin dashboard status:", error);
+            }
         });
     });
 </script>

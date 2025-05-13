@@ -112,7 +112,6 @@ i_login_db()
 thread_db()
 
 app.secret_key = "WellOffToVisitYourMother!" 
-
 @app.route('/')
 def index():
     if 'username' in session:
@@ -135,7 +134,7 @@ def displayThreads():
     username = session['username']
     
 
-    return render_template('threads.html', threads=threads, username=username, comments=comments, type="threads")
+    return render_template('threads.html', threads=threads, username=username, comments=comments, type="threads", loggedInUser=session['username'])
 
 @app.route("/login", methods=['POST'])
 @limiter.limit("5 per hour")
@@ -252,7 +251,7 @@ def thread(thread_id):
     conLog.close()
     con.close()
 
-    return render_template('thread-template.html', thread=thread, userPic=clean_url)
+    return render_template('thread-template.html', thread=thread, userPic=clean_url, loggedInUser=session['username'])
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
 def displayUserPage(username):
@@ -385,10 +384,16 @@ def adminDashboard():
     username = session['username']
     role = cur.execute('SELECT role FROM login WHERE username = ?', (username,)).fetchone()
     
-    if role or role[0] == 'admin':
-        return render_template('adminDashboard.html', username=session['username'])
+    if role and role[0] == 'admin':
+        return jsonify({'success': True})
     else:
-        return render_template('index.html')
+        return jsonify({'error': True}), 403
+            
+
+@app.route('/adminDashboard2', methods=['GET'])
+def adminDashboardPost():
+    username = session['username']
+    return render_template('adminDashboard.html', username=username)
 
 @app.route('/users', methods=['GET'])
 def users():
@@ -598,7 +603,40 @@ def testi(test_id):
     conLog.close()
     con.close()
     print(thread[7])
-    return render_template('test-template.html', thread=thread, userPic=clean_url)
+    return render_template('test-template.html', thread=thread, userPic=clean_url, loggedInUser=session['username'])
+
+@app.route('/deleteTest', methods=['GET', 'POST'])
+def deleteTest():
+    
+    if request.method == 'GET':
+        creator = request.args.get('creator')
+        if session['username'] == creator:
+            return jsonify({'success': True, 'creator': creator})
+        else:
+            return jsonify({'error': False, 'creator': creator})
+        
+    
+    if request.method == 'POST':
+        con = sqlite3.connect(database)
+        cur = con.cursor()
+        
+        thread_id = request.form.get('threadId')
+        
+        cur.execute('DELETE FROM testi WHERE id = ?', (thread_id,))
+        cur.execute('DELETE FROM test_comments WHERE test_id = ?', (thread_id,))
+        con.commit()
+        cur.execute('''
+            UPDATE testi
+            SET id = id - 1
+            WHERE id > ?
+        ''', (thread_id,))
+        
+        con.commit()
+        con.close()
+        
+        return redirect(url_for('index'))
+    
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

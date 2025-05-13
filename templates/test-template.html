@@ -16,11 +16,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a id="adminDashboard" class="nav-link" href="/adminDashboard" style="display: none;">Admin Dashboard</a></li>
+                    <li class="nav-item"><a id="adminDashboard" class="nav-link" href="/adminDashboard2" style="display: none;">Admin Dashboard</a></li>
                     <li class="nav-item"><a id="requests" class="nav-link" href="/displayRequests" style="display: none;">Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="/">Domov</a></li>
                     <li class="nav-item"><a class="nav-link" href="/cuteCat">Cute Maček</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('displayUserPage', username=username) }}">Profil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('displayUserPage', username=loggedInUser) }}">Profil</a></li>
                     <li class="nav-item"><a class="nav-link" href="/logout">Odjava</a></li>
                     <li>
                         <form class="d-flex" id="searchForm" method="GET" action="/search">
@@ -50,7 +50,7 @@
                     {% endfor %}
                 </div>
             {% endif %}
-                <button id="delete1" onclick="deleteThread()" style="display: none;">Delete Thread</button>
+                <button id="delete1" onclick="deleteTest()" style="display: none;">Delete Thread</button>
             </div>
             
 
@@ -95,10 +95,10 @@
 
     $(document).ready(function() {
         const deleteButton = document.getElementById('delete1');
-        const creator = "{{ thread[3] }}";
+        const creator = "{{ thread[5] }}";
 
         $.ajax({
-            url: "/deleteThread",
+            url: "/deleteTest",
             method: 'GET',
             data: {
                 creator: creator
@@ -114,24 +114,6 @@
                 },
         });
 
-    function deleteComment(commentId) {
-        $.ajax({
-            url: "/deleteComment",
-            method: 'POST',
-            data: {
-                username: "{{ loggedInUser }}",
-                type:'test',
-                postId: '{{ thread[0] }}',
-                commentId: commentId
-            },
-            success: function(result) {
-                location.reload();
-            },
-        });
-    }
-
-
-    $(document).ready(function() {
         const username = "{{ username }}";
         const adminButton = document.getElementById('adminDashboard');
         const requestButton = document.getElementById('requests');
@@ -150,5 +132,39 @@
             },
         });
     });
+
+    function deleteComment(commentId) {
+        $.ajax({
+            url: "/deleteComment",
+            method: 'POST',
+            data: {
+                username: "{{ loggedInUser }}",
+                type:'test',
+                postId: '{{ thread[0] }}',
+                commentId: commentId
+            },
+            success: function(result) {
+                location.reload();
+            },
+        });
+    }
+
+    function deleteTest() {
+        const username = "{{ username }}";
+        const threadId = "{{ thread[0] }}";
+        $.ajax({
+            url: "/deleteTest",
+            method: 'POST',
+            data: {
+                username: username,
+                threadId: threadId
+            },
+            success: function(result) {
+                alert("Thread deleted successfully.");
+                window.location.href = "/";
+            }
+        });
+    };
+
 </script>
 </html>
