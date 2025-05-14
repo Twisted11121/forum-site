@@ -303,6 +303,11 @@ def updateProfile():
     username = session['username']
     bio = request.form.get('bio', None)
     userPic = request.files.get('profilePic', None)
+    password = request.form.get('password', None)
+    
+    if password:
+        hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
+        cur.execute('UPDATE login SET password = ? WHERE username = ?', (hashed_pw, username))
 
     if bio or userPic:
         if userPic:
@@ -315,6 +320,7 @@ def updateProfile():
         
         con.commit()
 
+    con.commit()
     con.close()
 
     return redirect(url_for('displayUserPage', username=username))
