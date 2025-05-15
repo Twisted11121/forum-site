@@ -15,7 +15,7 @@ app = Flask(__name__)
 limiter = Limiter(
     app=app,
     key_func=get_remote_address,
-    default_limits=["50 per day", "10 per hour"]
+    default_limits=["10000 per day", "1000 per hour"]
 )
 database = 'threads.db'
 login_db = 'login.db'
@@ -101,6 +101,7 @@ def thread_db():
             test_id INTEGER NOT NULL,
             username TEXT NOT NULL,
             content TEXT NOT NULL,
+            pictures TEXT,
             FOREIGN KEY (test_id) REFERENCES testi (id) ON DELETE CASCADE
         )
     ''')
@@ -498,17 +499,25 @@ def deleteComment():
     if type1 == "test":
         creator = cur.execute('SELECT username FROM test_comments WHERE id = ?', (comment_id,)).fetchone()
         if session['username'] == 'admin' or user == creator[0]:
+            
+            pics = cur.execute('SELECT pictures FROM test_comments WHERE id = ?', (comment_id,)).fetchone()
+            if pics and pics[0]:
+                for filename in pics[0].split(','):
+                    file_path = os.path.join('testPic', filename)
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+            
             cur.execute('DELETE FROM test_comments WHERE id = ?', (comment_id,))
             con.commit()
             con.close()
-            return redirect(url_for('testi', test_id=post_id))
+            return redirect(url_for('test1'))
     else:
         creator  = cur.execute('SELECT username FROM comments WHERE id = ?', (comment_id,)).fetchone()
         if session['username'] == 'admin' or user == creator[0]:
             cur.execute('DELETE FROM comments WHERE id = ?', (comment_id,))
             con.commit()
             con.close()
-            return redirect(url_for('thread', thread_id=post_id))
+            return redirect(url_for('displayThreads'))
 
 
 
@@ -585,9 +594,28 @@ def testi(test_id):
 
     if request.method == 'POST':
         content = request.form['content']
-        username = session['username']  
+        username = session['username']
 
-        cur.execute('INSERT INTO test_comments (test_id, username, content) VALUES (?, ?, ?)', (test_id, username, content))
+        print(content)
+
+        pictures = request.files.getlist('reply-images')
+        uploaded_files = []
+        print(uploaded_files)
+        directory = 'testPic'
+
+        for file in pictures:
+            if file and file.filename != '':
+                formatted_filename = re.sub(r'\s+', '_', file.filename)
+                formatted_filename = re.sub(r'[^\w\.-]', '', formatted_filename)
+                file_path = os.path.join(directory, formatted_filename)
+                file.save(file_path)
+                uploaded_files.append(formatted_filename)
+        uploaded_files_str = ','.join(uploaded_files)
+
+        cur.execute(
+            'INSERT INTO test_comments (test_id, username, content, pictures) VALUES (?, ?, ?, ?)',
+            (test_id, username, content, uploaded_files_str)
+        )
         con.commit()
 
     creator = cur.execute('SELECT creator FROM testi WHERE id = ?', (test_id,)).fetchone()
@@ -627,7 +655,15 @@ def deleteTest():
         cur = con.cursor()
         
         thread_id = request.form.get('threadId')
-        
+
+        pics = cur.execute('SELECT testPic FROM testi WHERE id = ?', (thread_id,)).fetchone()
+        if pics and pics[0]:
+            for filename in pics[0].split(','):
+                file_path = os.path.join('testPic', filename)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+        # Delete test and its comments
         cur.execute('DELETE FROM testi WHERE id = ?', (thread_id,))
         cur.execute('DELETE FROM test_comments WHERE test_id = ?', (thread_id,))
         con.commit()

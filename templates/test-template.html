@@ -67,6 +67,14 @@
             <div class="flex-grow-1">
                 <div class="border rounded p-3 bg-light shadow-sm">
                 <p class="mb-0 text-secondary">{{ comment[3] }}</p>
+                {% if comment[4] %}
+                    {% set images = comment[4].split(',') %}
+                    <div class="mt-2 d-flex flex-wrap gap-2">
+                    {% for image in images %}
+                        <img src="{{ url_for('test_pictures', filename=image) }}" alt="comment_image" class="img-fluid rounded" style="max-width: 150px; height: auto;">
+                    {% endfor %}
+                    </div>
+                {% endif %}
                 </div>
                 {% if loggedInUser == comment[2] or loggedInUser == "admin" %}
                 <button class="btn btn-sm btn-danger mt-2" onclick="deleteComment('{{ comment[0] }}')">Delete</button>
@@ -77,13 +85,16 @@
         </div>
 
         <h5>Add a Reply</h5>
-        <form id="reply-form" action="{{ url_for('testi', test_id=thread[0]) }}" method="post">
+        <form id="reply-form" action="{{ url_for('testi', test_id=thread[0]) }}" method="post" enctype="multipart/form-data">
             <div class="mb-3">
-                <textarea id="reply-content" class="form-control" name="content" rows="3" placeholder="Write a reply..." required></textarea>
+                <textarea id="content" class="form-control" name="content" rows="3" placeholder="Write a reply..." required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Post</button>
+            <div class="mb-3">
+                <label for="reply-images" class="form-label">Attach Images (optional):</label>
+                <input type="file" id="reply-images" name="reply-images" class="form-control" accept="image/*" multiple>
+            </div>
+            <button type="submit" class="btn btn-primary" onclick="console.log('test')">Post</button>
         </form>
-    </div>
     
     <footer class="bg-dark text-white text-center py-3 mt-4">
         <p>&copy; 2025 Forum. All Rights Reserved.</p>
