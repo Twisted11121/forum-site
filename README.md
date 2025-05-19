@@ -58,5 +58,5 @@
 11. Add the ability to post images on test threads ✓ 
 12. Add the delete thread option to admin dashboard for deleteing test threads
 13. add delete button to comments ✓ 
-14. Add the delete button to test threads and make it work :D
+14. Add the delete button to test threads and make it work :D ✓
 
