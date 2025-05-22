@@ -363,10 +363,16 @@ def search():
     cur = con.cursor()
     
     threads = cur.execute("SELECT * FROM threads WHERE title LIKE ?", ('%' + query + '%',)).fetchall()
-    
+    tests = cur.execute("SELECT * FROM testi WHERE title LIKE ?", ('%' + query + '%',)).fetchall()
+
     con.close()
     
-    return render_template('search.html', threads=threads, query=query, username=session['username'])
+    return render_template(
+        'search.html',
+        tests=tests,
+        threads=threads,
+        query=query,
+        username=session['username'])
 
 
 @app.route('/requestFeature', methods=['POST'])
