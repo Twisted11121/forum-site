@@ -642,7 +642,7 @@ def testi(test_id):
 
     conLog.close()
     con.close()
-    print(thread[7])
+    print(thread)
     return render_template('test-template.html', thread=thread, userPic=clean_url, loggedInUser=session['username'])
 
 @app.route('/deleteTest', methods=['GET', 'POST'])
