@@ -44,19 +44,3 @@
 2. Sodelovanje z lokalnimi podjetji za pridobitev ekskluzivnih ponudb
 3. Akcija “povabi prijatelja” (oba dobita kupon za eno izmed sodelujočih podjetij.)
 4. Ustno izročilo
-
-## TODO List:
-1. Search function ✓
-2. Main database ✓
-3. User profiles ✓
-4. Thread Creation ✓
-5. Moderation tools for admin ✓
-7. Handle users uploading images profile pictures ✓
-8. Add the profile button to the nav-bar.✓
-9. Add image button for creating test threads✓
-10. Fix the test, make it its own template. ✓
-11. Add the ability to post images on test threads ✓ 
-12. Add the delete thread option to admin dashboard for deleteing test threads
-13. add delete button to comments ✓ 
-14. Add the delete button to test threads and make it work :D ✓
-
